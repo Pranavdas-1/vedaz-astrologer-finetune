@@ -1,31 +1,27 @@
 # Vedaz Astrologer Fine-Tune
 
-Fine-tuning Qwen2.5-7B-Instruct on Vedaz's Vedic astrologer chat dataset using LoRA, a written guide for hosting the model on a VPS with vLLM, and manually written sample training data.
+LoRA fine-tuning of Qwen2.5-7B-Instruct on Vedaz's Vedic astrologer chat dataset (technical assessment submission).
 
 ## What's in this repo
 
-- `training/` — Notebook/script for data cleaning, LoRA fine-tuning, and evaluation
-- `qwen-astrologer-lora-final/` — Saved LoRA adapter weights (or a link if too large for GitHub — see note below)
-- `docs/vllm_hosting_writeup.md` — Step-by-step written guide to hosting the fine-tuned model on a VPS using vLLM
-- `docs/astrologer_chats_final.md` — 5 manually written sample conversations for future training data
+- `training/` — Notebook used for data cleaning, LoRA fine-tuning, and evaluation
+- `qwen-astrologer-lora-final/` — Saved LoRA adapter weights
+- `docs/vllm_hosting_writeup.md` — Written explanation of how to host the model on a VPS using vLLM (as requested in the assessment)
+- `docs/astrologer_chats_final.md` — 5 sample user-astrologer conversations (as requested in the assessment)
 
-## Approach
+## What I did
 
-1. **Data cleaning** — the provided JSON was newline-delimited with inconsistent trailing commas; wrote a parser to robustly load all 55 conversations (`training/clean_data.py`).
-2. **Base model** — started with Qwen2.5-1.5B-Instruct to validate the pipeline, then moved to Qwen2.5-7B-Instruct (loaded in 4-bit via bitsandbytes) once multilingual output quality became the priority.
-3. **Fine-tuning** — LoRA (`r=32, alpha=64`) via `trl`'s `SFTTrainer`, 4 epochs, tracked both training and validation loss.
-4. **Evaluation** — tested outputs across English, Hindi, and Hinglish prompts.
+1. **Cleaned the data** — the provided JSON file had inconsistent formatting (newline-separated objects, stray trailing commas), so I wrote a parser to load all 55 conversations reliably.
+2. **Fine-tuned the model** — started with Qwen2.5-1.5B-Instruct to test the pipeline, then moved to Qwen2.5-7B-Instruct (4-bit quantized) for better output quality.
+3. **Trained with LoRA** — using `trl`'s `SFTTrainer`, 4 epochs, tracking training and validation loss.
+4. **Tested the output** — ran the fine-tuned model on English, Hindi, and Hinglish prompts to check consistency.
 
-## Key findings / limitations
+## What I found
 
-- The model performs noticeably better in English than Hindi/Hinglish — likely a combination of the base model's stronger English capability and the limited per-language training examples (55 conversations split across three language styles).
-- Without access to a real ephemeris or the user's actual birth chart, the model can hallucinate specific planetary transits (e.g., stating "Mars is in Capricorn" without birth details) — a known limitation of LLM-only astrology chatbots. Fixing this properly would require either more training examples that consistently gate any astrological claim behind asking for birth details, or integrating an actual astrological calculation tool rather than relying on the model's imitation of astrological language.
-- The model sometimes over-applies crisis/helpline language to ordinary stress rather than reserving it for genuine emotional crises — addressed partially via a stricter system prompt, though a full fix would need more contrastive training examples (ordinary stress vs. genuine crisis).
+- The model responds noticeably better in English than in Hindi/Hinglish.
+- It sometimes states specific planetary positions without asking for the user's birth details first — not something a real astrologer would do, and a limitation of training on a small dataset.
+- It occasionally offers crisis-helpline language even for ordinary stress, when that should be reserved for genuine emotional crises.
 
-## Hosting (write-up)
+## Notes
 
-This was a written task, not an actual deployment. See [`docs/vllm_hosting_writeup.md`](docs/vllm_hosting_writeup.md) for the documented process of hosting a fine-tuned model on a VPS using vLLM — environment setup, serving the model, keeping it running via systemd, and exposing it securely behind Nginx.
-
-## Sample training data
-
-See [`docs/astrologer_chats_final.md`](docs/astrologer_chats_final.md) for 5 manually written conversations matching the dataset's style (kundli-based reasoning, "please wait a minute for analysis," empathetic tone, and non-fatalistic future timing).
+The LoRA adapter is small and included directly. If it's too large for GitHub, a download link is provided instead.
