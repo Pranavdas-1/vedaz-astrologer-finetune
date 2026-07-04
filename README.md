@@ -1,12 +1,12 @@
 # Vedaz Astrologer Fine-Tune
 
-Fine-tuning Qwen2.5-7B-Instruct on Vedaz's Vedic astrologer chat dataset using LoRA, with a vLLM-based VPS hosting guide and manually written sample training data.
+Fine-tuning Qwen2.5-7B-Instruct on Vedaz's Vedic astrologer chat dataset using LoRA, a written guide for hosting the model on a VPS with vLLM, and manually written sample training data.
 
 ## What's in this repo
 
 - `training/` — Notebook/script for data cleaning, LoRA fine-tuning, and evaluation
 - `qwen-astrologer-lora-final/` — Saved LoRA adapter weights (or a link if too large for GitHub — see note below)
-- `docs/vllm_hosting_writeup.md` — Step-by-step guide to hosting the fine-tuned model on a VPS using vLLM
+- `docs/vllm_hosting_writeup.md` — Step-by-step written guide to hosting the fine-tuned model on a VPS using vLLM
 - `docs/astrologer_chats_final.md` — 5 manually written sample conversations for future training data
 
 ## Approach
@@ -22,9 +22,9 @@ Fine-tuning Qwen2.5-7B-Instruct on Vedaz's Vedic astrologer chat dataset using L
 - Without access to a real ephemeris or the user's actual birth chart, the model can hallucinate specific planetary transits (e.g., stating "Mars is in Capricorn" without birth details) — a known limitation of LLM-only astrology chatbots. Fixing this properly would require either more training examples that consistently gate any astrological claim behind asking for birth details, or integrating an actual astrological calculation tool rather than relying on the model's imitation of astrological language.
 - The model sometimes over-applies crisis/helpline language to ordinary stress rather than reserving it for genuine emotional crises — addressed partially via a stricter system prompt, though a full fix would need more contrastive training examples (ordinary stress vs. genuine crisis).
 
-## Hosting
+## Hosting (write-up)
 
-See [`docs/vllm_hosting_writeup.md`](docs/vllm_hosting_writeup.md) for the full VPS + vLLM deployment process.
+This was a written task, not an actual deployment. See [`docs/vllm_hosting_writeup.md`](docs/vllm_hosting_writeup.md) for the documented process of hosting a fine-tuned model on a VPS using vLLM — environment setup, serving the model, keeping it running via systemd, and exposing it securely behind Nginx.
 
 ## Sample training data
 
